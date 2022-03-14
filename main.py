@@ -25,7 +25,7 @@ def writer(header, data, filename, dialect):
     with open(filename, "a+", newline="") as csvfile:
         write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
         write.writeheader()
-        print(filename)
+        # print(filename)
         # print(data)
         write.writerows(data)
 
@@ -35,24 +35,16 @@ def updater(filename, last_id, dialect, ctr):
     value = 0
     with open(filename, 'r', newline="") as file:
         data = [row for row in csv.DictReader(file, dialect=dialect)]
-        if ctr == 1:
-            for row in data:
-                last_id = float(row['Capacity/mA.h/g'])
-                ewe = float(row['Ewe/V'])
-                row['Capacity/mA.h/g'] = last_id
-                row['Ewe/V'] = ewe
-                # print(row['Capacity/mA.h/g'])
-        else:
-            for row in data:
+        for row in data:
+            if ctr == 1:
+                value = float(row['Capacity/mA.h/g'])
+            else:
                 value = last_id + float(row['Capacity/mA.h/g'])
-                row['Capacity/mA.h/g'] = value
-                # last_id = float(row['Capacity/mA.h/g'])
-                # row['Capacity/mA.h/g'] = last_id
-                ewe = float(row['Ewe/V'])
-                row['Ewe/V'] = ewe
-    # print(data)
+            row['Capacity/mA.h/g'] = value
+            ewe = float(row['Ewe/V'])
+            row['Ewe/V'] = ewe
+
     header = data[0].keys()
-    # os.remove('E:\dylan\\new.csv')
     writer(header, data, 'E:\dylan\\new.csv', dialect)
     last_id = value
     return last_id
@@ -60,6 +52,7 @@ def updater(filename, last_id, dialect, ctr):
 
 def main():
     count_files = 7
+    os.remove('E:\dylan\\new.csv')
     for i in range(1, count_files):
         filename = 'E:\dylan\File' + str(i) + '.csv'
         if i == 1:
@@ -68,9 +61,6 @@ def main():
             last_id = get_last_val(filename)
         else:
             last_id = updater(filename, last_id, dialect, i)
-        # print(filename)
-        # print('last_id')
-        # print(last_id)
 
 
 if __name__ == "__main__":
