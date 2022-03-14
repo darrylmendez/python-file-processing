@@ -14,10 +14,11 @@ def get_dialect(file_name):
         return sniffer.sniff(snip)
 
 
-def writer(header, data, filename, dialect):
+def writer(header, data, filename, dialect, ctr):
     with open(filename, "a+", newline="") as csvfile:
         write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
-        write.writeheader()
+        if ctr == 1:
+            write.writeheader()
         write.writerows(data)
 
 
@@ -36,7 +37,7 @@ def updater(filename, last_id, dialect, ctr):
             row['Ewe/V'] = ewe
 
     header = data[0].keys()
-    writer(header, data, 'E:\dylan\\new.csv', dialect)
+    writer(header, data, 'E:\dylan\\new.csv', dialect, ctr)
     last_id = value
     return last_id
 
