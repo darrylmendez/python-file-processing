@@ -2,11 +2,13 @@ import csv
 import os
 from _csv import writer
 from os.path import exists, dirname, join
-#from dotenv import load_dotenv
+
+import dotenv
 
 import logging
 
 import sniffer as sniffer
+from dotenv import load_dotenv
 
 sniffer = csv.Sniffer()
 
@@ -32,10 +34,7 @@ def updater(filename, last_id, dialect, ctr):
     with open(filename, 'r', newline="") as file:
         data = [row for row in csv.DictReader(file, dialect=dialect)]
         for row in data:
-            if ctr == 1:
-                value = float(row['Capacity/mA.h/g'])
-            else:
-                value = last_id + float(row['Capacity/mA.h/g'])
+            value = last_id + float(row['Capacity/mA.h/g'])
             row['Capacity/mA.h/g'] = value
             ewe = float(row['Ewe/V'])
             row['Ewe/V'] = ewe
@@ -52,6 +51,7 @@ def log():
     logger = logging.getLogger()
     return logger
 
+
 def set_vars():
     print(dirname(__file__))
     dotenv_path = join(dirname(__file__), '.env')
@@ -64,6 +64,7 @@ def set_vars():
     # dish_payload_url = os.environ.get('dish_payload_url')
     # global centree_url
     # centree_url = os.environ.get('centree_url')
+
 
 def process(logger):
     count_files = 7
