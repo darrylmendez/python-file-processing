@@ -14,19 +14,10 @@ def get_dialect(file_name):
         return sniffer.sniff(snip)
 
 
-def get_last_val(file_name):
-    with open(file_name, 'r', newline='') as file:
-        rw = csv.reader(file, get_dialect(file_name))
-        last_val = float(list(rw)[-1][0])
-    return last_val
-
-
 def writer(header, data, filename, dialect):
     with open(filename, "a+", newline="") as csvfile:
         write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
         write.writeheader()
-        # print(filename)
-        # print(data)
         write.writerows(data)
 
 
@@ -57,8 +48,7 @@ def main():
         filename = 'E:\dylan\File' + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
-            updater(filename, 0, dialect, i)
-            last_id = get_last_val(filename)
+            last_id = updater(filename, 0, dialect, i)
         else:
             last_id = updater(filename, last_id, dialect, i)
 
