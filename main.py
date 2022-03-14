@@ -29,7 +29,7 @@ def writer(header, data, filename, dialect, ctr):
 
 
 def updater(filename, last_id, dialect, ctr, logger):
-    logger.info('updater' + filename + ' ' + str(last_id))
+    logger.info('updater: ' + filename + ' Last Id ' + str(last_id))
     value = 0
     with open(filename, 'r', newline="") as file:
         data = [row for row in csv.DictReader(file, dialect=dialect)]
@@ -64,14 +64,16 @@ def set_vars(logger):
     input_file_name = os.environ.get('input_file_name')
 
 
-def get_file_count(file_path):
-    return len([name for name in os.listdir(file_path)])
+def get_file_count(file_path, logger):
+    file_count = len([name for name in os.listdir(file_path)])
+    logger.info('File Count: ' + str(file_count))
+    return file_count
 
 
 def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
-    for i in range(1, get_file_count(input_file_path) + 1):
+    for i in range(1, get_file_count(input_file_path, logger) + 1):
         filename = input_file_path + input_file_name + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
