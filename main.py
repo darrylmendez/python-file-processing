@@ -1,8 +1,9 @@
 import csv
+import os
+from _csv import writer
+
 import sniffer as sniffer
 
-count_files = 3
-i = 2
 sniffer = csv.Sniffer()
 
 
@@ -20,32 +21,57 @@ def get_last_val(file_name):
     return last_val
 
 
-last_id = get_last_val('E:\dylan\File1.csv')
-while i < count_files:
-    filename = 'E:\dylan\File' + str(i) + '.csv'
-    with open(filename, 'r', newline='') as f:
-        snippet = f.read(2048)
-        #go back to first row
-        f.seek(0)
-        dialect = sniffer.sniff(snippet)
-        reader = csv.reader(f, dialect)
-        if sniffer.has_header(snippet):
-            header_row = next(reader)
+def writer(header, data, filename, dialect):
+    with open(filename, "a+", newline="") as csvfile:
+        write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
+        write.writeheader()
+        print(filename)
+        # print(data)
+        write.writerows(data)
 
-        # for row in reader:
-        #     cap = float(row[0]) + last_id
-        #     print(cap)
-        #     writer = csv.writer(filename, delimiter='\t')
-        #     writer.writerow(cap, float(row[1]))
-    with open(filename, 'r+', newline="") as file:
-        readData = [row for row in csv.DictReader(file, delimiter='\t')]
-        for row in readData:
-            print(row['Capacity'])
-            last_id += float(row['Capacity'])
-            row['Capacity'] = last_id
-        #print(readData)
-        #readData[0]['Capacity'] = last_id + float(readData[0]['Capacity'])
-        # print(readData)
-        #readHeader = readData[0].keys()
-        #writer(readHeader, readData, filename, "update")
-    i += 1
+
+def updater(filename, last_id, dialect, ctr):
+    print('updater' + filename + ' ' + str(last_id))
+    value = 0
+    with open(filename, 'r', newline="") as file:
+        data = [row for row in csv.DictReader(file, dialect=dialect)]
+        if ctr == 1:
+            for row in data:
+                last_id = float(row['Capacity/mA.h/g'])
+                ewe = float(row['Ewe/V'])
+                row['Capacity/mA.h/g'] = last_id
+                row['Ewe/V'] = ewe
+                # print(row['Capacity/mA.h/g'])
+        else:
+            for row in data:
+                value = last_id + float(row['Capacity/mA.h/g'])
+                row['Capacity/mA.h/g'] = value
+                # last_id = float(row['Capacity/mA.h/g'])
+                # row['Capacity/mA.h/g'] = last_id
+                ewe = float(row['Ewe/V'])
+                row['Ewe/V'] = ewe
+    # print(data)
+    header = data[0].keys()
+    # os.remove('E:\dylan\\new.csv')
+    writer(header, data, 'E:\dylan\\new.csv', dialect)
+    last_id = value
+    return last_id
+
+
+def main():
+    count_files = 7
+    for i in range(1, count_files):
+        filename = 'E:\dylan\File' + str(i) + '.csv'
+        if i == 1:
+            dialect = get_dialect(filename)
+            updater(filename, 0, dialect, i)
+            last_id = get_last_val(filename)
+        else:
+            last_id = updater(filename, last_id, dialect, i)
+        # print(filename)
+        # print('last_id')
+        # print(last_id)
+
+
+if __name__ == "__main__":
+    main()
