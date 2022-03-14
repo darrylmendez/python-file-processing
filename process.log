@@ -1,8 +1,9 @@
-INFO 2022-03-14 15:45:18,215 - C:\Users\darry\PycharmProjects\pythonProject
-INFO 2022-03-14 15:45:18,215 - File Count: 6
-INFO 2022-03-14 15:45:18,231 - updater: E:\dylan\input\File1.csv Last Id 0
-INFO 2022-03-14 15:45:18,273 - updater: E:\dylan\input\File2.csv Last Id 125.9283635880712
-INFO 2022-03-14 15:45:18,273 - updater: E:\dylan\input\File3.csv Last Id 142.9659849539325
-INFO 2022-03-14 15:45:18,273 - updater: E:\dylan\input\File4.csv Last Id 150.58329000541906
-INFO 2022-03-14 15:45:18,289 - updater: E:\dylan\input\File5.csv Last Id 157.7364295567335
-INFO 2022-03-14 15:45:18,289 - updater: E:\dylan\input\File6.csv Last Id 164.4067740586103
+INFO 2022-03-14 16:14:55,800 - C:\Users\darry\PycharmProjects\pythonProject
+INFO 2022-03-14 16:14:55,800 - File Count: 7
+INFO 2022-03-14 16:14:55,816 - updater: E:\dylan\input\Cell23File1.csv Last Id 0
+INFO 2022-03-14 16:14:55,863 - updater: E:\dylan\input\Cell23File2.csv Last Id 120.6737090448329
+INFO 2022-03-14 16:14:55,863 - updater: E:\dylan\input\Cell23File3.csv Last Id 121.94097855996765
+INFO 2022-03-14 16:14:55,863 - updater: E:\dylan\input\Cell23File4.csv Last Id 129.93797335478033
+INFO 2022-03-14 16:14:55,878 - updater: E:\dylan\input\Cell23File5.csv Last Id 137.55157632906713
+INFO 2022-03-14 16:14:55,878 - updater: E:\dylan\input\Cell23File6.csv Last Id 144.4710860561522
+INFO 2022-03-14 16:14:55,888 - updater: E:\dylan\input\Cell23File7.csv Last Id 150.8377348253881

@@ -70,6 +70,13 @@ def get_file_count(file_path, logger):
     return file_count
 
 
+def init():
+    with open(os.listdir(input_file_path), 'r') as fin:
+        data = fin.read().splitlines(True)
+    with open(os.listdir(input_file_path), 'w') as f:
+        f.writelines(data[1:])
+
+
 def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
