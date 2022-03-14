@@ -71,7 +71,7 @@ def get_file_count(file_path):
 def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
-    for i in range(1, get_file_count(input_file_path)+1):
+    for i in range(1, get_file_count(input_file_path) + 1):
         filename = input_file_path + input_file_name + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
