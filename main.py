@@ -2,13 +2,13 @@ import csv
 import os
 from _csv import writer
 from os.path import exists, dirname, join
-
-import dotenv
-
 import logging
-
 import sniffer as sniffer
 from dotenv import load_dotenv
+
+global input_file_path
+global input_file_name
+global output_file_path
 
 sniffer = csv.Sniffer()
 
@@ -29,7 +29,7 @@ def writer(header, data, filename, dialect, ctr):
 
 
 def updater(filename, last_id, dialect, ctr):
-    print('updater' + filename + ' ' + str(last_id))
+    logger.info('updater' + filename + ' ' + str(last_id))
     value = 0
     with open(filename, 'r', newline="") as file:
         data = [row for row in csv.DictReader(file, dialect=dialect)]
@@ -40,7 +40,7 @@ def updater(filename, last_id, dialect, ctr):
             row['Ewe/V'] = ewe
 
     header = data[0].keys()
-    writer(header, data, 'E:\dylan\\new.csv', dialect, ctr)
+    writer(header, data, output_file_path, dialect, ctr)
     last_id = value
     return last_id
 
@@ -52,26 +52,27 @@ def log():
     return logger
 
 
-def set_vars():
-    print(dirname(__file__))
+def set_vars(logger):
+    logger.info(dirname(__file__))
     dotenv_path = join(dirname(__file__), '.env')
     load_dotenv(dotenv_path)
-    # global dish_auth_key
-    # dish_auth_key = os.environ.get('dish_auth_key')
-    # global dish_auth_url
-    # dish_auth_url = os.environ.get('dish_auth_url')
-    # global dish_payload_url
-    # dish_payload_url = os.environ.get('dish_payload_url')
-    # global centree_url
-    # centree_url = os.environ.get('centree_url')
+    global input_file_path
+    input_file_path = os.environ.get('input_file_path')
+    global output_file_path
+    output_file_path = os.environ.get('output_file_path')
+    global input_file_name
+    input_file_name = os.environ.get('input_file_name')
+
+
+def get_file_count(file_path):
+    return len([name for name in os.listdir(file_path)])
 
 
 def process(logger):
-    count_files = 7
-    if exists('E:\dylan\\new.csv'):
-        os.remove('E:\dylan\\new.csv')
-    for i in range(1, count_files):
-        filename = 'E:\dylan\File' + str(i) + '.csv'
+    if exists(output_file_path):
+        os.remove(output_file_path)
+    for i in range(1, get_file_count(input_file_path)):
+        filename = input_file_path + input_file_name + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
             last_id = updater(filename, 0, dialect, i)
@@ -81,7 +82,7 @@ def process(logger):
 
 def main():
     logger = log()
-    set_vars()
+    set_vars(logger)
     process(logger)
 
 
