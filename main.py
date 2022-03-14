@@ -28,7 +28,7 @@ def writer(header, data, filename, dialect, ctr):
         write.writerows(data)
 
 
-def updater(filename, last_id, dialect, ctr):
+def updater(filename, last_id, dialect, ctr, logger):
     logger.info('updater' + filename + ' ' + str(last_id))
     value = 0
     with open(filename, 'r', newline="") as file:
@@ -75,9 +75,9 @@ def process(logger):
         filename = input_file_path + input_file_name + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
-            last_id = updater(filename, 0, dialect, i)
+            last_id = updater(filename, 0, dialect, i, logger)
         else:
-            last_id = updater(filename, last_id, dialect, i)
+            last_id = updater(filename, last_id, dialect, i, logger)
 
 
 def main():
