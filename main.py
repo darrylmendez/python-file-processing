@@ -1,6 +1,10 @@
 import csv
 import os
 from _csv import writer
+from os.path import exists, dirname, join
+#from dotenv import load_dotenv
+
+import logging
 
 import sniffer as sniffer
 
@@ -42,9 +46,29 @@ def updater(filename, last_id, dialect, ctr):
     return last_id
 
 
-def main():
+def log():
+    log_format = "%(levelname)s %(asctime)s - %(message)s"
+    logging.basicConfig(filename="process.log", level=logging.DEBUG, format=log_format, filemode='w')
+    logger = logging.getLogger()
+    return logger
+
+def set_vars():
+    print(dirname(__file__))
+    dotenv_path = join(dirname(__file__), '.env')
+    load_dotenv(dotenv_path)
+    # global dish_auth_key
+    # dish_auth_key = os.environ.get('dish_auth_key')
+    # global dish_auth_url
+    # dish_auth_url = os.environ.get('dish_auth_url')
+    # global dish_payload_url
+    # dish_payload_url = os.environ.get('dish_payload_url')
+    # global centree_url
+    # centree_url = os.environ.get('centree_url')
+
+def process(logger):
     count_files = 7
-    os.remove('E:\dylan\\new.csv')
+    if exists('E:\dylan\\new.csv'):
+        os.remove('E:\dylan\\new.csv')
     for i in range(1, count_files):
         filename = 'E:\dylan\File' + str(i) + '.csv'
         if i == 1:
@@ -52,6 +76,12 @@ def main():
             last_id = updater(filename, 0, dialect, i)
         else:
             last_id = updater(filename, last_id, dialect, i)
+
+
+def main():
+    logger = log()
+    set_vars()
+    process(logger)
 
 
 if __name__ == "__main__":
