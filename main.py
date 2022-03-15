@@ -80,7 +80,7 @@ def init():
 def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
-    for i in range(1, get_file_count(input_file_path, logger) + 1):
+    for i in range(1, get_file_count(input_file_path, logger) ):
         filename = input_file_path + input_file_name + str(i) + '.csv'
         if i == 1:
             dialect = get_dialect(filename)
