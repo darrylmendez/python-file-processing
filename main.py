@@ -15,6 +15,7 @@ global stage_file_path
 sniffer = csv.Sniffer()
 
 
+# Infer the dialect of the file
 def get_dialect(file_name):
     with open(file_name, 'r', newline='') as fn:
         snip = fn.read(2048)
@@ -22,32 +23,45 @@ def get_dialect(file_name):
         return sniffer.sniff(snip)
 
 
+# Write the final output file
 def writer(header, data, filename, dialect, ctr):
+    # Open the file in append mode
     with open(filename, "a+", newline="") as csvfile:
+        # Write the dictionary values
         write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
+        # Write the header only for the first file
         if ctr == 0:
             write.writeheader()
+        # Write the data to the file
         write.writerows(data)
 
-    # Read multiple files, get last_id from the first file, add last_id to every row in consecutive file
 
-
+# Read multiple files, get last_id from the first file, add last_id to every row in consecutive file
 def updater(filename, last_id, dialect, ctr, logger):
     logger.info('updater: ' + filename + ' Last Id ' + str(last_id))
+    # Read staging File
     with open(filename, 'r', newline="") as file:
+        # For each row in the file create a dictionary
         data = [row for row in csv.DictReader(file, dialect=dialect)]
         for row in data:
+            # Add last_id with the Capacity
             value = last_id + float(row['Capacity/mA.h/g'])
+            # Assign the value to the Capacity Dictionary
             row['Capacity/mA.h/g'] = value
+            # Convert ewe to float
             ewe = float(row['Ewe/V'])
+            # Assign the value back to the dictionary
             row['Ewe/V'] = ewe
-
+    # Get the header from the dictionary
     header = data[0].keys()
+    # Write the output file
     writer(header, data, output_file_path, dialect, ctr)
+    # Return the last value in the file as last_id
     last_id = value
     return last_id
 
 
+# Define logging method, logs are written to process.log
 def log():
     log_format = "%(levelname)s %(asctime)s - %(message)s"
     logging.basicConfig(filename="process.log", level=logging.DEBUG, format=log_format, filemode='w')
@@ -55,6 +69,7 @@ def log():
     return logger
 
 
+# Set the global variables read from .env file
 def set_vars(logger):
     logger.info(dirname(__file__))
     dotenv_path = join(dirname(__file__), '.env')
@@ -69,17 +84,20 @@ def set_vars(logger):
     stage_file_path = os.environ.get('stage_file_path')
 
 
+# Get the File Count in the staging directory
 def get_file_count(file_path, logger):
     file_count = len([name for name in os.listdir(file_path)])
     logger.info('File Count: ' + str(file_count))
     return file_count
 
 
+# Create staging files from RAW Input File
 def file_writer(data, filename):
     with open(filename, "a+", newline="") as csvfile:
         csvfile.write(data)
 
 
+# Cleanup Staging Directory
 def stage_cleanup(logger):
     path = stage_file_path
     for f in os.listdir(path):
@@ -87,7 +105,9 @@ def stage_cleanup(logger):
         os.remove(os.path.join(path, f))
 
 
-def find_header(line, logger):
+# Find extraneous data from processing using regular expressions
+# If extraneous data is found then return 1
+def find_extraneous(line, logger):
     regex = r"\S.mpr"
     matches = re.finditer(regex, line, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
@@ -96,22 +116,35 @@ def find_header(line, logger):
 
 
 def file_split(logger):
+    # Cleanup Staging folder
     stage_cleanup(logger)
+    # Determine raw input file name using path and name combination
     filename = input_file_path + input_file_name
+    # Set the file name counter to 0, the total file count depends on the number of headers
+    # of the form Capacity/mA.h/g	Ewe/V
     counter = 0
-
-    stage_file_name = ""
+    # Read the RAW input file
     with open(filename, "r") as input_file:
+        # For each line in the file
         for line in input_file:
-            match = find_header(line, logger)
+            # Find the header of the form .mpr
+            # if found then skip the row from processing
+            match = find_extraneous(line, logger)
+            # If match is 1 then continue to the next row in the file
             if match == 1:
                 continue
+            # If the line starts with Capacity/mA.h/g	Ewe/V
+            # then identify it as a new file
             elif line.startswith('Capacity/mA.h/g	Ewe/V'):
+                # Generate a new file name using a running counter
+                # starting from zero
                 stage_file_name = stage_file_path + 'File' + str(counter) + '.csv'
                 file_writer(line, stage_file_name)
                 counter = counter + 1
             else:
+                # If it's a blank line skip from processing
                 if line != "\n":
+                    # Write the record
                     file_writer(line, stage_file_name)
 
 
