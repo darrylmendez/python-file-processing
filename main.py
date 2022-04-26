@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 global input_file_path
 global input_file_name
 global output_file_path
-
+global stage_file_path
 sniffer = csv.Sniffer()
 
 
@@ -23,14 +23,13 @@ def get_dialect(file_name):
 def writer(header, data, filename, dialect, ctr):
     with open(filename, "a+", newline="") as csvfile:
         write = csv.DictWriter(csvfile, fieldnames=header, dialect=dialect)
-        if ctr == 1:
+        if ctr == 0:
             write.writeheader()
         write.writerows(data)
 
 
 def updater(filename, last_id, dialect, ctr, logger):
     logger.info('updater: ' + filename + ' Last Id ' + str(last_id))
-    value = 0
     with open(filename, 'r', newline="") as file:
         data = [row for row in csv.DictReader(file, dialect=dialect)]
         for row in data:
@@ -62,6 +61,8 @@ def set_vars(logger):
     output_file_path = os.environ.get('output_file_path')
     global input_file_name
     input_file_name = os.environ.get('input_file_name')
+    global stage_file_path
+    stage_file_path = os.environ.get('stage_file_path')
 
 
 def get_file_count(file_path, logger):
@@ -70,19 +71,43 @@ def get_file_count(file_path, logger):
     return file_count
 
 
-def init():
-    with open(os.listdir(input_file_path), 'r') as fin:
-        data = fin.read().splitlines(True)
-    with open(os.listdir(input_file_path), 'w') as f:
-        f.writelines(data[1:])
+def file_writer(data, filename):
+    with open(filename, "a+", newline="") as csvfile:
+        csvfile.write(data)
+
+
+def stage_cleanup(logger):
+    path = stage_file_path
+    for f in os.listdir(path):
+        logger.info("stage cleanup : " + f)
+        os.remove(os.path.join(path, f))
+
+
+def file_split(logger):
+    stage_cleanup(logger)
+    filename = input_file_path + input_file_name
+    counter = -1
+    with open(filename, "r") as input_file:
+        for line in input_file:
+            if line.startswith('C:'):
+                counter = counter + 1
+                stage_file_name = stage_file_path + 'File' + str(counter) + '.csv'
+                logger.info("File Split : " + stage_file_name)
+                continue
+            else:
+                if line != "\n":
+                    file_writer(line, stage_file_name)
 
 
 def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
-    for i in range(1, get_file_count(input_file_path, logger) ):
-        filename = input_file_path + input_file_name + str(i) + '.csv'
-        if i == 1:
+    file_count = get_file_count(stage_file_path, logger)
+    for i in range(0, file_count):
+        filename = stage_file_path + 'File' + str(i) + '.csv'
+        if exists(filename):
+            os.remove(filename)
+        if i == 0:
             dialect = get_dialect(filename)
             last_id = updater(filename, 0, dialect, i, logger)
         else:
@@ -92,6 +117,7 @@ def process(logger):
 def main():
     logger = log()
     set_vars(logger)
+    file_split(logger)
     process(logger)
 
 
