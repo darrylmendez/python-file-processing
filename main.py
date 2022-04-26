@@ -89,10 +89,10 @@ def file_split(logger):
     counter = 0
     with open(filename, "r") as input_file:
         for line in input_file:
-            if line.startswith('C:'):
-                counter = counter + 1
+            if line.startswith('C:') or line.startswith('D:'):
                 stage_file_name = stage_file_path + 'File' + str(counter) + '.csv'
                 logger.info("File Split : " + stage_file_name)
+                counter = counter + 1
                 continue
             else:
                 if line != "\n":
@@ -103,9 +103,9 @@ def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
     file_count = get_file_count(stage_file_path, logger)
-    for i in range(1, file_count + 1):
+    for i in range(0, file_count):
         filename = stage_file_path + 'File' + str(i) + '.csv'
-        if i == 1:
+        if i == 0:
             dialect = get_dialect(filename)
             last_id = updater(filename, 0, dialect, i, logger)
         else:
