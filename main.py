@@ -86,7 +86,7 @@ def stage_cleanup(logger):
 def file_split(logger):
     stage_cleanup(logger)
     filename = input_file_path + input_file_name
-    counter = -1
+    counter = 0
     with open(filename, "r") as input_file:
         for line in input_file:
             if line.startswith('C:'):
@@ -103,11 +103,9 @@ def process(logger):
     if exists(output_file_path):
         os.remove(output_file_path)
     file_count = get_file_count(stage_file_path, logger)
-    for i in range(0, file_count):
+    for i in range(1, file_count + 1):
         filename = stage_file_path + 'File' + str(i) + '.csv'
-        if exists(filename):
-            os.remove(filename)
-        if i == 0:
+        if i == 1:
             dialect = get_dialect(filename)
             last_id = updater(filename, 0, dialect, i, logger)
         else:
